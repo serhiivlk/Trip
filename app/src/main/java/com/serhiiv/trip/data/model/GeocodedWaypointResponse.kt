@@ -1,4 +1,4 @@
-package com.serhiiv.road.data.model
+package com.serhiiv.trip.data.model
 
 
 import com.squareup.moshi.Json

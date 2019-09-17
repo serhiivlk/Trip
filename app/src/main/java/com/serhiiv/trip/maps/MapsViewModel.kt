@@ -3,13 +3,15 @@ package com.serhiiv.trip.maps
 import androidx.lifecycle.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.serhiiv.trip.data.repository.DirectionsRepository
 import com.serhiiv.trip.misc.CurrentLocationProvider
 import com.serhiiv.trip.utils.Logger
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MapsViewModel @Inject constructor(
-    private val currentLocationProvider: CurrentLocationProvider
+    private val currentLocationProvider: CurrentLocationProvider,
+    private val repository: DirectionsRepository
 ) : ViewModel() {
     private val mutableState = MutableLiveData<UiState>()
     val state: LiveData<UiState>

@@ -11,6 +11,7 @@ import dagger.android.support.AndroidSupportInjectionModule
 @Component(
     modules = [
         AndroidSupportInjectionModule::class,
+        DataModule::class,
         FeatureMapsModule::class
     ]
 )
