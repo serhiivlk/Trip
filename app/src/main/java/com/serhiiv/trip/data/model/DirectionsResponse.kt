@@ -11,5 +11,7 @@ data class DirectionsResponse(
     @field:Json(name = "routes")
     val routes: List<RouteResponse> = emptyList(),
     @field:Json(name = "status")
-    val status: String? = null
+    val status: String? = null,
+    @field:Json(name = "error_message")
+    val errorMessage: String? = null
 )

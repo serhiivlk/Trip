@@ -14,6 +14,9 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.Polyline
+import com.google.android.gms.maps.model.PolylineOptions
+import com.google.maps.android.PolyUtil
 import com.serhiiv.trip.R
 import com.serhiiv.trip.utils.Markers
 import dagger.android.support.DaggerAppCompatActivity
@@ -30,6 +33,7 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var originMarker: Marker
     private lateinit var destinationMarker: Marker
+    private lateinit var routePolyline: Polyline
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +46,7 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+        map.setOnMapLongClickListener { viewModel.processDirection(it) }
 
         enableMyLocationIfPermitted()
 
@@ -49,6 +54,17 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback {
             map.isMyLocationEnabled = state.currentLocationIsEnable
 
             state.originPosition?.let(::updateOriginMarkerPosition)
+            state.destinationPosition?.let {
+                updateDestinationMarkerPosition(it, state.tripInfo)
+            }
+            state.polylinePoints.let(::updatePolyline)
+            state.infoMessage?.consume()?.let {
+                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+            }
+
+            state.error?.consume()?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -67,10 +83,31 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback {
     private fun updateOriginMarkerPosition(position: LatLng) {
         if (::originMarker.isInitialized.not()) {
             originMarker = map.addMarker(Markers.buildOriginOptions(position))
+            map.moveCamera(CameraUpdateFactory.newLatLng(originMarker.position))
         } else {
             originMarker.position = position
         }
-        map.moveCamera(CameraUpdateFactory.newLatLng(originMarker.position))
+    }
+
+    private fun updateDestinationMarkerPosition(position: LatLng, title: String?) {
+        if (::destinationMarker.isInitialized.not()) {
+            destinationMarker = map.addMarker(Markers.buildDestinationOptions(position))
+        } else {
+            destinationMarker.position = position
+        }
+        title?.let {
+            destinationMarker.title = it
+            destinationMarker.showInfoWindow()
+        }
+    }
+
+    private fun updatePolyline(points: String?) {
+        val positions = points?.let(PolyUtil::decode) ?: emptyList()
+        if (::routePolyline.isInitialized.not()) {
+            routePolyline = map.addPolyline(PolylineOptions().addAll(positions))
+        } else {
+            routePolyline.points = positions
+        }
     }
 
     private fun enableMyLocationIfPermitted() {

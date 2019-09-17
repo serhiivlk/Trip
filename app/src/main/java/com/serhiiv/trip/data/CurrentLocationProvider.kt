@@ -1,4 +1,4 @@
-package com.serhiiv.trip.misc
+package com.serhiiv.trip.data
 
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
